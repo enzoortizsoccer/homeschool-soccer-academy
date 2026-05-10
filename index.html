@@ -1,1 +1,580 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inscripción — Homeschool Soccer Academy</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    :root {
+      --green-dark: #0F6E56;
+      --green-mid: #1D9E75;
+      --green-light: #E1F5EE;
+      --green-pale: #F0FBF7;
+      --amber: #EF9F27;
+      --amber-light: #FAEEDA;
+      --red-light: #FCEBEB;
+      --red-dark: #993C1D;
+      --gray: #5F5E5A;
+      --gray-light: #F1EFE8;
+      --border: 0.5px solid #D3D1C7;
+      --radius: 10px;
+      --radius-sm: 6px;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #F8F7F3;
+      color: #2C2C2A;
+      min-height: 100vh;
+      padding: 2rem 1rem 4rem;
+    }
+
+    .page-wrap {
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      background: var(--green-dark);
+      border-radius: var(--radius);
+      padding: 1.75rem 2rem;
+      margin-bottom: 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '⚽';
+      font-size: 100px;
+      position: absolute;
+      right: -12px;
+      top: -16px;
+      opacity: 0.10;
+      line-height: 1;
+      pointer-events: none;
+    }
+    .hero-tag {
+      display: inline-block;
+      background: var(--amber);
+      color: #412402;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 3px 12px;
+      border-radius: 20px;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .hero h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 32px;
+      color: #fff;
+      letter-spacing: 1.5px;
+      line-height: 1.05;
+      margin-bottom: 6px;
+    }
+    .hero p {
+      font-size: 13px;
+      color: #9FE1CB;
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: #fff;
+      border: var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .section-title {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--green-dark);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 1rem;
+      padding-bottom: 6px;
+      border-bottom: 1.5px solid var(--green-light);
+    }
+
+    /* ── Grid ── */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 520px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .talla-grid { grid-template-columns: repeat(3, 1fr) !important; }
+    }
+
+    /* ── Fields ── */
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin-bottom: 10px;
+    }
+    .field:last-child { margin-bottom: 0; }
+
+    label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--gray);
+    }
+    .req { color: #D85A30; margin-left: 2px; }
+
+    input[type="text"],
+    input[type="tel"],
+    input[type="email"],
+    input[type="date"],
+    select,
+    textarea {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      padding: 9px 11px;
+      border: var(--border);
+      border-radius: var(--radius-sm);
+      background: #FAFAF8;
+      color: #2C2C2A;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      outline: none;
+      width: 100%;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--green-mid);
+      box-shadow: 0 0 0 3px #1D9E7518;
+      background: #fff;
+    }
+    textarea { resize: none; height: 76px; }
+    select { cursor: pointer; }
+
+    /* ── Categoria badge ── */
+    .cat-badge {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      background: var(--green-light);
+      color: var(--green-dark);
+      border: 1px solid #5DCAA540;
+      margin-top: 4px;
+      width: fit-content;
+    }
+    .cat-badge.fuera {
+      background: var(--red-light);
+      color: var(--red-dark);
+      border-color: #F0997B50;
+    }
+    .cat-hint {
+      font-size: 12px;
+      color: #888780;
+      margin-top: 4px;
+      display: flex;
+      gap: 6px;
+      align-items: flex-start;
+    }
+    .cat-hint span { color: var(--green-mid); }
+
+    /* ── Talla ── */
+    .talla-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .talla-opt { display: none; }
+    .talla-lbl {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+      border: var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      color: var(--gray);
+      transition: all 0.15s;
+      background: #FAFAF8;
+    }
+    .talla-lbl:hover { border-color: var(--green-mid); color: var(--green-dark); }
+    .talla-opt:checked + .talla-lbl {
+      background: var(--green-dark);
+      color: #fff;
+      border-color: var(--green-dark);
+    }
+
+    /* ── Checkboxes ── */
+    .check-label {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      cursor: pointer;
+      font-size: 13px;
+      color: #2C2C2A;
+      font-weight: 400;
+      line-height: 1.5;
+    }
+    .check-label input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      min-width: 16px;
+      margin-top: 2px;
+      accent-color: var(--green-dark);
+      cursor: pointer;
+    }
+
+    /* ── Submit ── */
+    .submit-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--green-dark);
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      letter-spacing: 0.3px;
+      transition: background 0.15s, transform 0.1s;
+      margin-top: 0.5rem;
+    }
+    .submit-btn:hover { background: var(--green-mid); }
+    .submit-btn:active { transform: scale(0.99); }
+    .submit-btn:disabled {
+      background: #B4B2A9;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* ── Sending / Success ── */
+    .sending-msg {
+      display: none;
+      text-align: center;
+      padding: 0.75rem;
+      font-size: 13px;
+      color: var(--green-dark);
+      font-weight: 500;
+    }
+
+    .success-card {
+      display: none;
+      text-align: center;
+      padding: 3rem 2rem;
+      background: #fff;
+      border: var(--border);
+      border-radius: var(--radius);
+    }
+    .success-icon {
+      font-size: 48px;
+      margin-bottom: 1rem;
+    }
+    .success-card h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 26px;
+      color: var(--green-dark);
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+    .success-card p {
+      font-size: 14px;
+      color: var(--gray);
+      line-height: 1.6;
+    }
+    .success-card .sheet-link {
+      display: inline-block;
+      margin-top: 1.5rem;
+      padding: 10px 20px;
+      background: var(--green-light);
+      color: var(--green-dark);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+    .success-card .sheet-link:hover { background: #9FE1CB; }
+
+    /* ── Footer ── */
+    .footer {
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 12px;
+      color: #B4B2A9;
+    }
+  </style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <div class="hero">
+    <div class="hero-tag">Academia de Fútbol</div>
+    <h1>Formulario de Inscripción</h1>
+    <p>Homeschool Soccer Academy &nbsp;·&nbsp; Temporada 2026–2027</p>
+  </div>
+
+  <div id="mainForm">
+
+    <!-- Datos del jugador -->
+    <div class="card">
+      <div class="section-title">Datos del jugador</div>
+      <div class="grid-2">
+        <div class="field">
+          <label for="nombre">Nombre<span class="req">*</span></label>
+          <input id="nombre" type="text" placeholder="Ej. Carlos">
+        </div>
+        <div class="field">
+          <label for="apellido">Apellido<span class="req">*</span></label>
+          <input id="apellido" type="text" placeholder="Ej. Rodríguez">
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label for="dob">Fecha de nacimiento<span class="req">*</span></label>
+          <input id="dob" type="date" oninput="calcCategoria()">
+        </div>
+        <div class="field">
+          <label for="genero">Género<span class="req">*</span></label>
+          <select id="genero">
+            <option value="">Seleccionar...</option>
+            <option>Masculino</option>
+            <option>Femenino</option>
+            <option>Otro</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Categoría asignada</label>
+        <div id="catBadge" class="cat-badge">⚽ <span id="catText"></span></div>
+        <div id="catHint" class="cat-hint"><span>ⓘ</span> Se asigna automáticamente al ingresar la fecha de nacimiento.</div>
+      </div>
+    </div>
+
+    <!-- Contacto -->
+    <div class="card">
+      <div class="section-title">Datos de contacto / tutor</div>
+      <div class="grid-2">
+        <div class="field">
+          <label for="tutor">Nombre del tutor<span class="req">*</span></label>
+          <input id="tutor" type="text" placeholder="Nombre completo">
+        </div>
+        <div class="field">
+          <label for="parentesco">Parentesco</label>
+          <select id="parentesco">
+            <option value="">Seleccionar...</option>
+            <option>Madre</option>
+            <option>Padre</option>
+            <option>Abuelo/a</option>
+            <option>Otro</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label for="tel">Teléfono<span class="req">*</span></label>
+          <input id="tel" type="tel" placeholder="(000) 000-0000">
+        </div>
+        <div class="field">
+          <label for="email">Email<span class="req">*</span></label>
+          <input id="email" type="email" placeholder="correo@ejemplo.com">
+        </div>
+      </div>
+      <div class="field">
+        <label for="dir">Dirección</label>
+        <input id="dir" type="text" placeholder="Ciudad, Estado">
+      </div>
+    </div>
+
+    <!-- Deportivo -->
+    <div class="card">
+      <div class="section-title">Información deportiva</div>
+      <div class="grid-2">
+        <div class="field">
+          <label for="posicion">Posición preferida</label>
+          <select id="posicion">
+            <option value="">Seleccionar...</option>
+            <option>Portero</option>
+            <option>Defensa</option>
+            <option>Medio</option>
+            <option>Delantero</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="exp">Experiencia previa</label>
+          <select id="exp">
+            <option value="">Seleccionar...</option>
+            <option>Sin experiencia</option>
+            <option>1–2 años</option>
+            <option>3–5 años</option>
+            <option>Más de 5 años</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Talla de uniforme</label>
+        <div class="talla-grid">
+          <div><input type="radio" name="talla" id="tXS" value="XS" class="talla-opt"><label for="tXS" class="talla-lbl">XS</label></div>
+          <div><input type="radio" name="talla" id="tS"  value="S"  class="talla-opt"><label for="tS"  class="talla-lbl">S</label></div>
+          <div><input type="radio" name="talla" id="tM"  value="M"  class="talla-opt"><label for="tM"  class="talla-lbl">M</label></div>
+          <div><input type="radio" name="talla" id="tL"  value="L"  class="talla-opt"><label for="tL"  class="talla-lbl">L</label></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Médico -->
+    <div class="card">
+      <div class="section-title">Información médica</div>
+      <div class="field">
+        <label for="medico">Condiciones médicas o alergias relevantes</label>
+        <textarea id="medico" placeholder="Ej. asma, alergia a penicilina... (dejar en blanco si no aplica)"></textarea>
+      </div>
+      <div class="field">
+        <label for="emerg">Contacto de emergencia (nombre y teléfono)</label>
+        <input id="emerg" type="text" placeholder="Ej. María López – (786) 000-1234">
+      </div>
+    </div>
+
+    <!-- Autorizaciones -->
+    <div class="card">
+      <div class="section-title">Autorizaciones</div>
+      <div class="field">
+        <label class="check-label">
+          <input type="checkbox" id="auth1">
+          Autorizo el uso de fotografías y videos del jugador con fines académicos y de comunicación interna de la academia.
+        </label>
+      </div>
+      <div class="field">
+        <label class="check-label">
+          <input type="checkbox" id="auth2">
+          He leído y acepto el reglamento de la academia y el compromiso de asistencia.<span class="req">*</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Notas -->
+    <div class="field" style="margin-bottom:1.25rem;">
+      <label for="notas">Notas adicionales</label>
+      <textarea id="notas" placeholder="Cualquier información extra que desees compartir con los entrenadores..."></textarea>
+    </div>
+
+    <div class="sending-msg" id="sendingMsg">⏳ Enviando inscripción...</div>
+    <button class="submit-btn" id="submitBtn" onclick="submitForm()">Enviar inscripción →</button>
+
+  </div><!-- /mainForm -->
+
+  <!-- Success -->
+  <div class="success-card" id="successCard">
+    <div class="success-icon">✅</div>
+    <h2 id="successNombre">¡Inscripción enviada!</h2>
+    <p>Los datos fueron guardados correctamente.<br>Nos pondremos en contacto al correo registrado.</p>
+
+  </div>
+
+  <div class="footer">Homeschool Soccer Academy &nbsp;·&nbsp; enzoortizsoccer@gmail.com</div>
+
+</div><!-- /page-wrap -->
+
+<script>
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbym_VaORt9cZDxq7cn3kR81_XI8I-9ZQj_ry1dcC8MQN4dg9yNcJDLMaBg4rdH2FFuz/exec";
+
+  const CATS = [
+    {n:'Sub-6 (Peques)',  min:3,  max:5},
+    {n:'Sub-8 (Rayo)',    min:6,  max:7},
+    {n:'Sub-10 (Estrella)',min:8, max:9},
+    {n:'Sub-12 (Juvenil A)',min:10,max:11},
+    {n:'Sub-14 (Juvenil B)',min:12,max:13},
+    {n:'Sub-16 (Cadete)', min:14, max:15},
+    {n:'Sub-18 (Pre-senior)',min:16,max:17},
+  ];
+
+  function calcCategoria() {
+    const dob = document.getElementById('dob').value;
+    const badge = document.getElementById('catBadge');
+    const hint  = document.getElementById('catHint');
+    if (!dob) { badge.style.display='none'; hint.style.display='flex'; return; }
+    const birth = new Date(dob), today = new Date();
+    let age = today.getFullYear() - birth.getFullYear();
+    const m = today.getMonth() - birth.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+    const cat = CATS.find(c => age >= c.min && age <= c.max);
+    badge.className = 'cat-badge' + (cat ? '' : ' fuera');
+    document.getElementById('catText').textContent = cat
+      ? cat.n + ' (' + age + ' años)'
+      : 'Fuera de rango (' + age + ' años)';
+    badge.style.display = 'inline-flex';
+    hint.style.display  = 'none';
+  }
+
+  async function submitForm() {
+    const required = {
+      nombre:'Nombre', apellido:'Apellido', dob:'Fecha de nacimiento',
+      genero:'Género', tutor:'Tutor', tel:'Teléfono', email:'Email'
+    };
+    for (const [id, lbl] of Object.entries(required)) {
+      if (!document.getElementById(id).value.trim()) {
+        alert('Por favor completa el campo: ' + lbl);
+        document.getElementById(id).focus();
+        return;
+      }
+    }
+    if (!document.getElementById('auth2').checked) {
+      alert('Debes aceptar el reglamento para continuar.');
+      return;
+    }
+
+    const talla = document.querySelector('input[name="talla"]:checked');
+    const btn   = document.getElementById('submitBtn');
+    const msg   = document.getElementById('sendingMsg');
+    btn.disabled = true;
+    msg.style.display = 'block';
+
+    const payload = {
+      nombre:       document.getElementById('nombre').value.trim(),
+      apellido:     document.getElementById('apellido').value.trim(),
+      dob:          document.getElementById('dob').value,
+      genero:       document.getElementById('genero').value,
+      posicion:     document.getElementById('posicion').value,
+      experiencia:  document.getElementById('exp').value,
+      talla:        talla ? talla.value : '',
+      tutor:        document.getElementById('tutor').value.trim(),
+      parentesco:   document.getElementById('parentesco').value,
+      telefono:     document.getElementById('tel').value.trim(),
+      email:        document.getElementById('email').value.trim(),
+      direccion:    document.getElementById('dir').value.trim(),
+      emergencia:   document.getElementById('emerg').value.trim(),
+      medico:       document.getElementById('medico').value.trim(),
+      authFotos:    document.getElementById('auth1').checked,
+      authReglamento: document.getElementById('auth2').checked,
+      notas:        document.getElementById('notas').value.trim()
+    };
+
+    try {
+      await fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const nombre = payload.nombre + ' ' + payload.apellido;
+      document.getElementById('mainForm').style.display = 'none';
+      document.getElementById('successNombre').textContent = '¡Inscripción de ' + nombre + ' enviada!';
+      document.getElementById('successCard').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (err) {
+      btn.disabled = false;
+      msg.style.display = 'none';
+      alert('Error al enviar. Verifica tu conexión e intenta de nuevo.');
+    }
+  }
+</script>
+</body>
+</html>
