@@ -561,14 +561,10 @@
     </div>
     <div class="section-body">
       <div class="field">
-        <label><span data-i18n="selectSchedule">Seleccioná el horario</span> <span class="req">*</span></label>
-        <input type="hidden" id="horario" required>
-        <div class="horarios-grid" id="horariosGrid">
-          <button type="button" class="horario-btn" onclick="selHorario(this,'9:30 AM')">⚽ 9:30 AM</button>
-          <button type="button" class="horario-btn" onclick="selHorario(this,'10:30 AM')">⚽ 10:30 AM</button>
-        </div>
-        <div class="dias-info" data-i18n="scheduleNote">Lunes y Miércoles — se pueden agregar más días y horarios</div>
-        <span class="err-msg" id="err-horario" data-i18n="errSchedule">Por favor seleccioná un horario</span>
+        <label data-i18n="scheduleLabel">Horario asignado</label>
+        <input type="hidden" id="horario" value="Lunes y Miercoles 9:30-10:30 AM">
+        <div class="cat-display" data-i18n="scheduleFixed">⚽ Lunes y Miércoles · 9:30 AM – 10:30 AM</div>
+        <div class="dias-info" data-i18n="scheduleNote">Por ahora es el único horario disponible — más adelante se podrán agregar otros</div>
       </div>
     </div>
   </div>
@@ -612,8 +608,12 @@
           <input type="text" id="direccion" placeholder="Ciudad, Estado">
         </div>
         <div class="field">
-          <label data-i18n="emergency">Contacto de emergencia</label>
-          <input type="text" id="emergencia" placeholder="Nombre y teléfono">
+          <label data-i18n="emergencyName">Contacto de emergencia · Nombre</label>
+          <input type="text" id="emergenciaNombre" placeholder="Nombre del contacto">
+        </div>
+        <div class="field">
+          <label data-i18n="emergencyPhone">Contacto de emergencia · Teléfono</label>
+          <input type="tel" id="emergenciaTelefono" placeholder="(954) 555-0100">
         </div>
       </div>
     </div>
@@ -761,14 +761,14 @@ const translations = {
     experience: 'Experiencia previa', expSelect: 'Seleccionar...',
     exp0: 'Sin experiencia', exp1: '1–2 años', exp2: '3–5 años', exp3: 'Más de 5 años',
     jerseySize: 'Talla de camiseta', adultSize: 'Adulto S', adultSizeM: 'Adulto M', adultSizeL: 'Adulto L',
-    sec2title: 'Horario de Práctica', selectSchedule: 'Seleccioná el horario',
-    scheduleNote: 'Lunes y Miércoles — se pueden agregar más días y horarios',
-    errSchedule: 'Por favor seleccioná un horario',
+    sec2title: 'Horario de Práctica', scheduleLabel: 'Horario asignado',
+    scheduleFixed: '⚽ Lunes y Miércoles · 9:30 AM – 10:30 AM',
+    scheduleNote: 'Por ahora es el único horario disponible — más adelante se podrán agregar otros',
     sec3title: 'Datos del Tutor / Padre o Madre', tutorName: 'Nombre completo',
     relationship: 'Parentesco', relSelect: 'Seleccionar...',
     relFather: 'Padre', relMother: 'Madre', relGuardian: 'Tutor Legal', relOther: 'Otro',
     phone: 'Teléfono', email: 'Email', address: 'Dirección',
-    emergency: 'Contacto de emergencia',
+    emergencyName: 'Contacto de emergencia · Nombre', emergencyPhone: 'Contacto de emergencia · Teléfono',
     sec4title: 'Información Médica',
     medicalLabel: 'Alergias, condiciones o información médica relevante',
     sec5title: 'Información de Pago',
@@ -794,14 +794,14 @@ const translations = {
     experience: 'Previous Experience', expSelect: 'Select...',
     exp0: 'No experience', exp1: '1–2 years', exp2: '3–5 years', exp3: 'More than 5 years',
     jerseySize: 'Jersey Size', adultSize: 'Adult S', adultSizeM: 'Adult M', adultSizeL: 'Adult L',
-    sec2title: 'Practice Schedule', selectSchedule: 'Select the schedule',
-    scheduleNote: 'Monday & Wednesday — more days/times may be added',
-    errSchedule: 'Please select a schedule',
+    sec2title: 'Practice Schedule', scheduleLabel: 'Assigned schedule',
+    scheduleFixed: '⚽ Monday & Wednesday · 9:30 AM – 10:30 AM',
+    scheduleNote: 'This is the only schedule available for now — more may be added later',
     sec3title: 'Parent / Guardian Information', tutorName: 'Full Name',
     relationship: 'Relationship', relSelect: 'Select...',
     relFather: 'Father', relMother: 'Mother', relGuardian: 'Legal Guardian', relOther: 'Other',
     phone: 'Phone', email: 'Email', address: 'Address',
-    emergency: 'Emergency Contact',
+    emergencyName: 'Emergency Contact · Name', emergencyPhone: 'Emergency Contact · Phone',
     sec4title: 'Medical Information',
     medicalLabel: 'Allergies, conditions, or relevant medical information',
     sec5title: 'Payment Information',
@@ -876,14 +876,6 @@ function selTalla(btn, val) {
   document.getElementById('talla').value = val;
 }
 
-// ── Horarios ──
-function selHorario(btn, val) {
-  document.querySelectorAll('.horario-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('horario').value = val;
-  document.getElementById('err-horario').style.display = 'none';
-}
-
 // ── Categoría como texto ──
 function getCategoria() {
   return document.getElementById('catDisplay').textContent.split('(')[0].trim();
@@ -916,10 +908,6 @@ function validate() {
   if (!email.value || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
     email.classList.add('error'); errEmail.style.display = 'block'; ok = false;
   } else { email.classList.remove('error'); errEmail.style.display = 'none'; }
-  // Horario
-  if (!document.getElementById('horario').value) {
-    document.getElementById('err-horario').style.display = 'block'; ok = false;
-  }
   // Reglamento
   if (!document.getElementById('aut-reglamento').checked) {
     document.getElementById('err-reglamento').style.display = 'block'; ok = false;
@@ -953,7 +941,8 @@ document.getElementById('regForm').addEventListener('submit', async function(e) 
     telefono: document.getElementById('telefono').value,
     email: document.getElementById('email').value,
     direccion: document.getElementById('direccion').value,
-    emergencia: document.getElementById('emergencia').value,
+    emergenciaNombre: document.getElementById('emergenciaNombre').value,
+    emergenciaTelefono: document.getElementById('emergenciaTelefono').value,
     medico: document.getElementById('medico').value,
     autorizaFotos: document.getElementById('aut-fotos').checked ? 'Sí' : 'No',
     aceptaReglamento: 'Sí',
