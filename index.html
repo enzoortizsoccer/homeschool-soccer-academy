@@ -958,9 +958,23 @@ document.getElementById('regForm').addEventListener('submit', async function(e) 
   } catch(err) {
     btn.disabled = false;
     btn.innerHTML = '⚽ ' + t.submit;
-    alert(currentLang === 'es'
-      ? 'No se pudo confirmar el envío (puede haber sido lento por la conexión). Antes de volver a intentar, avisá a la academia para confirmar si ya quedó registrado.'
-      : "Couldn't confirm the submission (may have been slow due to connection). Before retrying, please contact the academy to confirm if it already went through.");
+    const isTimeout = err && err.message && err.message.indexOf('Tiempo de espera') !== -1;
+    const isLoadFail = err && err.message && err.message.indexOf('No se pudo cargar') !== -1;
+    let msg;
+    if (isTimeout) {
+      msg = currentLang === 'es'
+        ? 'La respuesta tardó demasiado (puede que igual se haya guardado). Antes de volver a intentar, avisá a la academia para confirmar si ya quedó registrado.'
+        : "The response took too long (it may have still saved). Before retrying, please contact the academy to confirm if it already went through.";
+    } else if (isLoadFail) {
+      msg = currentLang === 'es'
+        ? 'No se pudo conectar — probablemente por la señal o el wifi en este momento. Esta vez no se guardó nada, podés intentar de nuevo cuando tengas mejor conexión.'
+        : "Couldn't connect — likely due to signal or wifi right now. Nothing was saved this time, you can try again once you have a better connection.";
+    } else {
+      msg = currentLang === 'es'
+        ? 'Error al enviar. Por favor intentá de nuevo.'
+        : 'Error submitting. Please try again.';
+    }
+    alert(msg);
     console.error(err);
   }
 });
