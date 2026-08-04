@@ -497,9 +497,30 @@
           <input type="text" id="nombre" placeholder="Stefano" required>
           <span class="err-msg" id="err-nombre" data-i18n="reqField">Campo requerido</span>
         </div>
-        <div class="field">
-          <label><span data-i18n="dob">Fecha de Nacimiento</span> <span class="req">*</span></label>
-          <input type="date" id="dob" required>
+        <div class="field full">
+          <label><span data-i18n="dob">Fecha de Nacimiento</span> <span class="req">*</span> <span style="font-weight:400;text-transform:none;color:var(--texto-sub)">(MM/DD/AAAA)</span></label>
+          <div class="grid-3" style="gap:8px;">
+            <select id="dobMonth">
+              <option value="" data-i18n="monthSelect">Mes...</option>
+              <option value="1" data-i18n="m1">Enero</option>
+              <option value="2" data-i18n="m2">Febrero</option>
+              <option value="3" data-i18n="m3">Marzo</option>
+              <option value="4" data-i18n="m4">Abril</option>
+              <option value="5" data-i18n="m5">Mayo</option>
+              <option value="6" data-i18n="m6">Junio</option>
+              <option value="7" data-i18n="m7">Julio</option>
+              <option value="8" data-i18n="m8">Agosto</option>
+              <option value="9" data-i18n="m9">Septiembre</option>
+              <option value="10" data-i18n="m10">Octubre</option>
+              <option value="11" data-i18n="m11">Noviembre</option>
+              <option value="12" data-i18n="m12">Diciembre</option>
+            </select>
+            <select id="dobDay">
+              <option value="" data-i18n="daySelect">Día...</option>
+            </select>
+            <input type="number" id="dobYear" placeholder="AAAA" min="1990" max="2026" inputmode="numeric">
+          </div>
+          <input type="hidden" id="dob">
           <span class="err-msg" id="err-dob" data-i18n="reqField">Campo requerido</span>
         </div>
         <div class="field">
@@ -754,6 +775,9 @@ const translations = {
     subtitle: 'Formulario de Inscripción', season: 'Temporada 2026–2027',
     sec1title: 'Datos del Jugador', lastName: 'Apellido', firstName: 'Nombre',
     dob: 'Fecha de Nacimiento', category: 'Categoría',
+    monthSelect: 'Mes...', daySelect: 'Día...',
+    m1: 'Enero', m2: 'Febrero', m3: 'Marzo', m4: 'Abril', m5: 'Mayo', m6: 'Junio',
+    m7: 'Julio', m8: 'Agosto', m9: 'Septiembre', m10: 'Octubre', m11: 'Noviembre', m12: 'Diciembre',
     categoryPlaceholder: '— se calcula automáticamente —',
     gender: 'Género', genderSelect: 'Seleccionar...', genderM: 'Masculino', genderF: 'Femenino', genderO: 'Otro',
     position: 'Posición preferida', posSelect: 'Seleccionar...',
@@ -787,6 +811,9 @@ const translations = {
     subtitle: 'Registration Form', season: 'Season 2026–2027',
     sec1title: 'Player Information', lastName: 'Last Name', firstName: 'First Name',
     dob: 'Date of Birth', category: 'Category',
+    monthSelect: 'Month...', daySelect: 'Day...',
+    m1: 'January', m2: 'February', m3: 'March', m4: 'April', m5: 'May', m6: 'June',
+    m7: 'July', m8: 'August', m9: 'September', m10: 'October', m11: 'November', m12: 'December',
     categoryPlaceholder: '— auto-calculated —',
     gender: 'Gender', genderSelect: 'Select...', genderM: 'Male', genderF: 'Female', genderO: 'Other',
     position: 'Preferred Position', posSelect: 'Select...',
@@ -833,6 +860,7 @@ function applyTranslations(lang) {
   document.getElementById('authRulesLabel').innerHTML = t.authRules;
   document.getElementById('langBtnText').textContent = lang === 'es' ? 'EN' : 'ES';
   document.documentElement.lang = lang;
+  refreshDayOptions();
 
   // No pisar la categoría si ya se calculó con una fecha de nacimiento
   if (!document.getElementById('dob').value) {
@@ -847,13 +875,69 @@ function toggleLang() {
   applyTranslations(currentLang);
 }
 
+// ── Fecha de nacimiento: Mes/Día/Año, sin objetos Date (evita bugs de huso horario) ──
+function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+
+function daysInMonth(month, year) {
+  if (!month) return 31;
+  const y = year || 2001; // año no bisiesto por defecto si todavía no se completó
+  return new Date(y, month, 0).getDate();
+}
+
+function refreshDayOptions() {
+  const monthSel = document.getElementById('dobMonth');
+  const daySel = document.getElementById('dobDay');
+  const yearVal = parseInt(document.getElementById('dobYear').value, 10) || null;
+  const month = parseInt(monthSel.value, 10) || null;
+  const prevDay = daySel.value;
+  const maxDay = daysInMonth(month, yearVal);
+  const t = translations[currentLang];
+  let html = '<option value="">' + t.daySelect + '</option>';
+  for (let d = 1; d <= maxDay; d++) html += '<option value="' + d + '">' + d + '</option>';
+  daySel.innerHTML = html;
+  if (prevDay && parseInt(prevDay, 10) <= maxDay) daySel.value = prevDay;
+}
+
+function updateDobFromParts() {
+  const month = document.getElementById('dobMonth').value;
+  const day = document.getElementById('dobDay').value;
+  const year = document.getElementById('dobYear').value;
+  const dobHidden = document.getElementById('dob');
+  if (month && day && year && year.length === 4) {
+    dobHidden.value = year + '-' + pad2(parseInt(month, 10)) + '-' + pad2(parseInt(day, 10));
+  } else {
+    dobHidden.value = '';
+  }
+  dobHidden.dispatchEvent(new Event('change'));
+}
+
+document.getElementById('dobMonth').addEventListener('change', function() { refreshDayOptions(); updateDobFromParts(); });
+document.getElementById('dobDay').addEventListener('change', updateDobFromParts);
+document.getElementById('dobYear').addEventListener('input', function() { refreshDayOptions(); updateDobFromParts(); });
+refreshDayOptions();
+
 // ── Categoría automática ──
 document.getElementById('dob').addEventListener('change', function() {
-  const dob = new Date(this.value + 'T00:00:00');
-  const today = new Date();
-  let age = today.getFullYear() - dob.getFullYear();
-  const m = today.getMonth() - dob.getMonth();
-  if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
+  const t = translations[currentLang];
+  const el = document.getElementById('catDisplay');
+  if (!this.value) {
+    el.textContent = t.categoryPlaceholder;
+    el.style.color = 'var(--texto-sub)';
+    el.style.borderColor = 'var(--gris-borde)';
+    el.style.background = 'var(--gris-bg)';
+    return;
+  }
+  // Aritmética pura de enteros — sin new Date() para el cumpleaños
+  const parts = this.value.split('-');
+  const dobYear = parseInt(parts[0], 10);
+  const dobMonth = parseInt(parts[1], 10);
+  const dobDay = parseInt(parts[2], 10);
+  const now = new Date();
+  const todayYear = now.getFullYear();
+  const todayMonth = now.getMonth() + 1;
+  const todayDay = now.getDate();
+  let age = todayYear - dobYear;
+  if (todayMonth < dobMonth || (todayMonth === dobMonth && todayDay < dobDay)) age--;
   const cats = [
     [0,4,'Sub-6 (Peques)'], [5,5,'Sub-6 (Peques)'], [6,7,'Sub-8 (Rayo)'],
     [8,9,'Sub-10 (Estrella)'], [10,11,'Sub-12 (Juvenil A)'],
@@ -861,8 +945,6 @@ document.getElementById('dob').addEventListener('change', function() {
     [16,17,'Sub-18 (Pre-senior)']
   ];
   const cat = cats.find(([min,max]) => age >= min && age <= max);
-  const t = translations[currentLang];
-  const el = document.getElementById('catDisplay');
   el.textContent = cat ? cat[2] + ' (' + age + ' ' + t.yearsSuffix + ')' : age >= 18 ? t.adultLabel : '—';
   el.style.color = cat ? 'var(--verde)' : 'var(--texto-sub)';
   el.style.borderColor = cat ? 'var(--verde)' : 'var(--gris-borde)';
