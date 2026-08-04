@@ -733,7 +733,7 @@ function jsonpRequest(params, timeoutMs) {
       settled = true;
       cleanup();
       reject(new Error('Tiempo de espera agotado'));
-    }, timeoutMs || 15000);
+    }, timeoutMs || 25000);
 
     script.onerror = () => {
       if (settled) return;
@@ -958,7 +958,9 @@ document.getElementById('regForm').addEventListener('submit', async function(e) 
   } catch(err) {
     btn.disabled = false;
     btn.innerHTML = '⚽ ' + t.submit;
-    alert('Error al enviar. Por favor intentá de nuevo.');
+    alert(currentLang === 'es'
+      ? 'No se pudo confirmar el envío (puede haber sido lento por la conexión). Antes de volver a intentar, avisá a la academia para confirmar si ya quedó registrado.'
+      : "Couldn't confirm the submission (may have been slow due to connection). Before retrying, please contact the academy to confirm if it already went through.");
     console.error(err);
   }
 });
