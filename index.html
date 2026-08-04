@@ -706,7 +706,47 @@
 </div>
 
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwz_REDhJuPq6CJY7TruNLq5qZB91Z8GqbJaSVlqcqk4eoDAe7YAtIlCPnq6EJBPN4/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzstiSfE5Ytymwj3SosHgC191ZN7Ql32EqPCukT7wyqjElD51PSG5cwxRL2arF-HPp_/exec';
+
+// ── JSONP helper (evita bloqueos de CORS) ──
+function jsonpRequest(params, timeoutMs) {
+  return new Promise((resolve, reject) => {
+    const cbName = 'hsaReg_' + Date.now() + '_' + Math.floor(Math.random()*10000);
+    const script = document.createElement('script');
+    let settled = false;
+
+    const cleanup = () => {
+      delete window[cbName];
+      if (script.parentNode) script.parentNode.removeChild(script);
+      clearTimeout(timer);
+    };
+
+    window[cbName] = (data) => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      resolve(data);
+    };
+
+    const timer = setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      reject(new Error('Tiempo de espera agotado'));
+    }, timeoutMs || 15000);
+
+    script.onerror = () => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      reject(new Error('No se pudo cargar el script'));
+    };
+
+    const query = new URLSearchParams({...params, callback: cbName}).toString();
+    script.src = SCRIPT_URL + '?' + query;
+    document.body.appendChild(script);
+  });
+}
 
 // ── Traducciones ──
 const translations = {
@@ -900,6 +940,7 @@ document.getElementById('regForm').addEventListener('submit', async function(e) 
   let age = today.getFullYear()-d.getFullYear();
   if (today.getMonth()<d.getMonth()||(today.getMonth()===d.getMonth()&&today.getDate()<d.getDate())) age--;
   const data = {
+    action: 'register',
     dob, apellido: document.getElementById('apellido').value,
     nombre: document.getElementById('nombre').value,
     genero: document.getElementById('genero').value,
@@ -916,10 +957,12 @@ document.getElementById('regForm').addEventListener('submit', async function(e) 
     medico: document.getElementById('medico').value,
     autorizaFotos: document.getElementById('aut-fotos').checked ? 'Sí' : 'No',
     aceptaReglamento: 'Sí',
+    idioma: currentLang.toUpperCase(),
     notas: document.getElementById('notas').value
   };
   try {
-    await fetch(SCRIPT_URL, {method:'POST', body: JSON.stringify(data)});
+    const result = await jsonpRequest(data);
+    if (!result || !result.ok) throw new Error('El script no confirmó el registro');
     document.getElementById('regForm').style.display = 'none';
     document.getElementById('successMsg').style.display = 'block';
     window.scrollTo({top:0, behavior:'smooth'});
@@ -927,6 +970,7 @@ document.getElementById('regForm').addEventListener('submit', async function(e) 
     btn.disabled = false;
     btn.innerHTML = '⚽ ' + t.submit;
     alert('Error al enviar. Por favor intentá de nuevo.');
+    console.error(err);
   }
 });
 </script>
