@@ -769,6 +769,42 @@ function jsonpRequest(params, timeoutMs) {
   });
 }
 
+// ── Respaldo: env\u00edo por formulario oculto (no usa <script> din\u00e1mico) ──
+// Para navegadores/apps que bloquean la t\u00e9cnica de arriba (ej. algunos navegadores
+// internos de apps de mensajer\u00eda). No se puede confirmar la respuesta porque es
+// otro dominio, as\u00ed que se usa solo como \u00faltimo recurso.
+function submitViaHiddenForm(params) {
+  return new Promise((resolve) => {
+    const frameName = 'hsaFallbackFrame_' + Date.now();
+    const iframe = document.createElement('iframe');
+    iframe.name = frameName;
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+
+    const form = document.createElement('form');
+    form.method = 'GET';
+    form.action = SCRIPT_URL;
+    form.target = frameName;
+
+    Object.keys(params).forEach((key) => {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = key;
+      input.value = params[key];
+      form.appendChild(input);
+    });
+
+    document.body.appendChild(form);
+    form.submit();
+
+    setTimeout(() => {
+      form.remove();
+      iframe.remove();
+      resolve(); // No hay forma de confirmar \u00e9xito real; se asume que se envi\u00f3
+    }, 3000);
+  });
+}
+
 // ── Traducciones ──
 const translations = {
   es: {
@@ -1006,9 +1042,6 @@ document.getElementById('regForm').addEventListener('submit', async function(e) 
   btn.disabled = true;
   btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> ' + t.submitting;
   const dob = document.getElementById('dob').value;
-  const today = new Date(); const d = new Date(dob+'T00:00:00');
-  let age = today.getFullYear()-d.getFullYear();
-  if (today.getMonth()<d.getMonth()||(today.getMonth()===d.getMonth()&&today.getDate()<d.getDate())) age--;
   const data = {
     action: 'register',
     dob, apellido: document.getElementById('apellido').value,
@@ -1032,25 +1065,55 @@ document.getElementById('regForm').addEventListener('submit', async function(e) 
     notas: document.getElementById('notas').value
   };
   try {
-    const result = await jsonpRequest(data);
+    let result, lastErr;
+    const maxAttempts = 3; // 1 intento inicial + 2 reintentos, solo si nunca llegó a conectar
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        result = await jsonpRequest(data);
+        lastErr = null;
+        break;
+      } catch (err) {
+        lastErr = err;
+        const isLoadFail = err && err.message && err.message.indexOf('No se pudo cargar') !== -1;
+        if (isLoadFail && attempt < maxAttempts) {
+          btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> ' +
+            (currentLang === 'es' ? 'Reintentando conexión...' : 'Retrying connection...');
+          await new Promise(r => setTimeout(r, 2500));
+          continue;
+        }
+        throw err;
+      }
+    }
+    if (lastErr) throw lastErr;
     if (!result || !result.ok) throw new Error('El script no confirmó el registro');
     document.getElementById('regForm').style.display = 'none';
     document.getElementById('successMsg').style.display = 'block';
     window.scrollTo({top:0, behavior:'smooth'});
   } catch(err) {
+    const isLoadFailPrimary = err && err.message && err.message.indexOf('No se pudo cargar') !== -1;
+
+    if (isLoadFailPrimary) {
+      // Último recurso: método alternativo por formulario oculto
+      btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> ' +
+        (currentLang === 'es' ? 'Probando método alternativo...' : 'Trying alternate method...');
+      await submitViaHiddenForm(data);
+      btn.disabled = false;
+      btn.innerHTML = '⚽ ' + t.submit;
+      alert(currentLang === 'es'
+        ? 'El método principal falló, pero enviamos tus datos por una vía alternativa como respaldo. No podemos confirmar automáticamente si llegó — por favor avisá a la academia para chequear antes de reenviar.'
+        : "The main method failed, but we sent your info through a backup method just in case. We can't automatically confirm it went through — please contact the academy to check before resubmitting.");
+      console.error(err);
+      return;
+    }
+
     btn.disabled = false;
     btn.innerHTML = '⚽ ' + t.submit;
     const isTimeout = err && err.message && err.message.indexOf('Tiempo de espera') !== -1;
-    const isLoadFail = err && err.message && err.message.indexOf('No se pudo cargar') !== -1;
     let msg;
     if (isTimeout) {
       msg = currentLang === 'es'
         ? 'La respuesta tardó demasiado (puede que igual se haya guardado). Antes de volver a intentar, avisá a la academia para confirmar si ya quedó registrado.'
         : "The response took too long (it may have still saved). Before retrying, please contact the academy to confirm if it already went through.";
-    } else if (isLoadFail) {
-      msg = currentLang === 'es'
-        ? 'No se pudo conectar — probablemente por la señal o el wifi en este momento. Esta vez no se guardó nada, podés intentar de nuevo cuando tengas mejor conexión.'
-        : "Couldn't connect — likely due to signal or wifi right now. Nothing was saved this time, you can try again once you have a better connection.";
     } else {
       msg = currentLang === 'es'
         ? 'Error al enviar. Por favor intentá de nuevo.'
