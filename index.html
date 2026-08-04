@@ -489,12 +489,12 @@
       <div class="grid-2">
         <div class="field">
           <label><span data-i18n="lastName">Apellido</span> <span class="req">*</span></label>
-          <input type="text" id="apellido" placeholder="Ortiz" required>
+          <input type="text" id="apellido" placeholder="Apellido" required>
           <span class="err-msg" id="err-apellido" data-i18n="reqField">Campo requerido</span>
         </div>
         <div class="field">
           <label><span data-i18n="firstName">Nombre</span> <span class="req">*</span></label>
-          <input type="text" id="nombre" placeholder="Stefano" required>
+          <input type="text" id="nombre" placeholder="Nombre" required>
           <span class="err-msg" id="err-nombre" data-i18n="reqField">Campo requerido</span>
         </div>
         <div class="field full">
@@ -895,6 +895,8 @@ function applyTranslations(lang) {
   document.getElementById('authPhotosLabel').innerHTML = t.authPhotos;
   document.getElementById('authRulesLabel').innerHTML = t.authRules;
   document.getElementById('langBtnText').textContent = lang === 'es' ? 'EN' : 'ES';
+  document.getElementById('apellido').placeholder = t.lastName;
+  document.getElementById('nombre').placeholder = t.firstName;
   document.documentElement.lang = lang;
   refreshDayOptions();
 
