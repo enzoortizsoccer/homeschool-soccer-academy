@@ -977,10 +977,9 @@ document.getElementById('dob').addEventListener('change', function() {
   let age = todayYear - dobYear;
   if (todayMonth < dobMonth || (todayMonth === dobMonth && todayDay < dobDay)) age--;
   const cats = [
-    [0,4,'Sub-6 (Peques)'], [5,5,'Sub-6 (Peques)'], [6,7,'Sub-8 (Rayo)'],
+    [4,5,'Sub-6 (Peques)'], [6,7,'Sub-8 (Rayo)'],
     [8,9,'Sub-10 (Estrella)'], [10,11,'Sub-12 (Juvenil A)'],
-    [12,13,'Sub-14 (Juvenil B)'], [14,15,'Sub-16 (Cadete)'],
-    [16,17,'Sub-18 (Pre-senior)']
+    [12,14,'Sub-14 (Juvenil B)']
   ];
   const cat = cats.find(([min,max]) => age >= min && age <= max);
   el.textContent = cat ? cat[2] + ' (' + age + ' ' + t.yearsSuffix + ')' : age >= 18 ? t.adultLabel : '—';
