@@ -696,6 +696,18 @@
       <span class="err-msg" id="err-reglamento" data-i18n="errRules">Debes aceptar el reglamento para continuar</span>
 
       <div class="field" style="margin-top:16px">
+        <label data-i18n="comoTeEnteraste">¿Cómo te enteraste de nosotros?</label>
+        <select id="comoTeEnteraste">
+          <option value="" data-i18n="ceOpcionElegir">Elegí una opción...</option>
+          <option value="Evento" data-i18n="ceOpcionEvento">Un evento (feria, encuentro de homeschoolers)</option>
+          <option value="Recomendación" data-i18n="ceOpcionRecomendacion">Recomendación de otra familia</option>
+          <option value="Redes sociales" data-i18n="ceOpcionRedes">Redes sociales (Instagram, Facebook, etc.)</option>
+          <option value="Búsqueda en internet" data-i18n="ceOpcionBusqueda">Búsqueda en internet / Google</option>
+          <option value="Otro" data-i18n="ceOpcionOtro">Otro</option>
+        </select>
+      </div>
+
+      <div class="field" style="margin-top:16px">
         <label data-i18n="notes">Notas adicionales</label>
         <textarea id="notas" placeholder="Cualquier información adicional que quieras compartir..."></textarea>
       </div>
@@ -838,6 +850,10 @@ const translations = {
     authRules: 'Acepto el <strong>reglamento</strong> de la academia y me comprometo a cumplirlo. <span class="req">*</span>',
     errRules: 'Debes aceptar el reglamento para continuar',
     notes: 'Notas adicionales', submit: 'Enviar Inscripción', submitting: 'Enviando...',
+    comoTeEnteraste: '¿Cómo te enteraste de nosotros?', ceOpcionElegir: 'Elegí una opción...',
+    ceOpcionEvento: 'Un evento (feria, encuentro de homeschoolers)', ceOpcionRecomendacion: 'Recomendación de otra familia',
+    ceOpcionRedes: 'Redes sociales (Instagram, Facebook, etc.)', ceOpcionBusqueda: 'Búsqueda en internet / Google',
+    ceOpcionOtro: 'Otro',
     successTitle: '¡Inscripción recibida!',
     successBody: 'Nos contactaremos a la brevedad para confirmar el lugar.',
     reqField: 'Campo requerido', invalidEmail: 'Email inválido',
@@ -874,6 +890,10 @@ const translations = {
     authRules: "I accept the academy's <strong>rules</strong> and agree to follow them. <span class=\"req\">*</span>",
     errRules: 'You must accept the rules to continue',
     notes: 'Additional Notes', submit: 'Submit Registration', submitting: 'Submitting...',
+    comoTeEnteraste: 'How did you hear about us?', ceOpcionElegir: 'Choose an option...',
+    ceOpcionEvento: 'An event (fair, homeschool meetup)', ceOpcionRecomendacion: 'Recommendation from another family',
+    ceOpcionRedes: 'Social media (Instagram, Facebook, etc.)', ceOpcionBusqueda: 'Internet search / Google',
+    ceOpcionOtro: 'Other',
     successTitle: 'Registration received!',
     successBody: "We'll contact you shortly to confirm your spot.",
     reqField: 'Required field', invalidEmail: 'Invalid email',
@@ -977,9 +997,8 @@ document.getElementById('dob').addEventListener('change', function() {
   let age = todayYear - dobYear;
   if (todayMonth < dobMonth || (todayMonth === dobMonth && todayDay < dobDay)) age--;
   const cats = [
-    [4,5,'Sub-6 (Peques)'], [6,7,'Sub-8 (Rayo)'],
-    [8,9,'Sub-10 (Estrella)'], [10,11,'Sub-12 (Juvenil A)'],
-    [12,14,'Sub-14 (Juvenil B)']
+    [5,6,'Sub-7 (Peques)'], [7,8,'Sub-9 (Rayo)'],
+    [9,10,'Sub-11 (Estrella)'], [11,13,'Sub-13 (Juvenil)']
   ];
   const cat = cats.find(([min,max]) => age >= min && age <= max);
   el.textContent = cat ? cat[2] + ' (' + age + ' ' + t.yearsSuffix + ')' : age >= 18 ? t.adultLabel : '—';
@@ -1063,6 +1082,7 @@ document.getElementById('regForm').addEventListener('submit', async function(e) 
     autorizaFotos: document.getElementById('aut-fotos').checked ? 'Sí' : 'No',
     aceptaReglamento: 'Sí',
     idioma: currentLang.toUpperCase(),
+    comoTeEnteraste: document.getElementById('comoTeEnteraste').value,
     notas: document.getElementById('notas').value
   };
   try {
